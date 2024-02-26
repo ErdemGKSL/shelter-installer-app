@@ -1,7 +1,3 @@
-# Tauri + Svelte + Typescript
+Shelter Installer (written in rust/tauri)
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+![APP](https://cdn.discordapp.com/attachments/887446333047312464/1211670296181088357/image.png?ex=65ef0ae6&is=65dc95e6&hm=b74eb5a2e4f1e5282db6d5ac8b179f8fcb81f6d1db34fc8afa7bddf2ff649c13&)
