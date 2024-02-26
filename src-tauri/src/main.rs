@@ -17,6 +17,7 @@ async fn toggle_inject(discord_type: &str) -> Result<(), String> {
     return toggle_inject_raw(discord_type.into()).await
 }
 
+
 #[tauri::command]
 fn is_installed(discord_type: &str) -> (bool, bool) {
     if let Ok((_, installed)) = get_resources_folder(discord_type.into(), true).or(get_resources_folder(discord_type.into(), false)) {
