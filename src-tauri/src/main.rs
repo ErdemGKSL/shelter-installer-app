@@ -17,6 +17,16 @@ async fn toggle_inject(discord_type: &str) -> Result<(), String> {
     return toggle_inject_raw(discord_type.into()).await
 }
 
+#[tauri::command]
+async fn update(discord_type: &str) -> Result<(), String> {
+    let discord_type: Type = discord_type.into();
+    let (resources, _) = get_resources_folder(discord_type.clone(), true).or(get_resources_folder(discord_type, false))?;
+
+    let app_path = resources.join("app");
+
+    inject_raw(resources, app_path).await
+}
+
 
 #[tauri::command]
 fn is_installed(discord_type: &str) -> (bool, bool) {
@@ -29,7 +39,7 @@ fn is_installed(discord_type: &str) -> (bool, bool) {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, is_installed, toggle_inject])
+        .invoke_handler(tauri::generate_handler![greet, is_installed, toggle_inject, update])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -67,36 +77,47 @@ const DOWNLOAD_FILES: [&str; 3] = [
   "https://raw.githubusercontent.com/uwu/shelter/main/injectors/desktop/app/package.json"
 ];
 
+async fn inject_raw(resources: PathBuf, app_path: PathBuf) -> Result<(), String> {
+
+    let app_asar_path = resources.join("app.asar");
+
+    if app_asar_path.exists() {
+        std::fs::rename(
+            resources.join("app.asar"),
+            resources.join("original.asar")
+        ).map_err(|_| "Couldn't rename the app.asar in the resources while installing.")?;
+    }
+    
+    std::fs::create_dir_all(&app_path)
+        .map_err(|_| "Couldn't create app directory while installing.")?;
+
+    for file_url in DOWNLOAD_FILES {
+        let file_name = file_url.split("/").last().unwrap();
+
+        download_file(app_path.join(file_name), file_url.to_string()).await?;
+    }
+    Ok(())
+}
+
 async fn toggle_inject_raw(discord_type: Type) -> Result<(), String> {
   let (resources, installed) = get_resources_folder(discord_type.clone(), true).or(get_resources_folder(discord_type, false))?;
 
   let app_path = resources.join("app");
 
   if installed {
-    std::fs::remove_dir_all(app_path).map_err(|_| "Couldn't remove app folder in the resources while uninstalling.")?;
-
     std::fs::rename(
       resources.join("original.asar"),
       resources.join("app.asar")
     ).map_err(|_| "Couldn't rename the original.asar in the resources while uninstalling.")?;
 
+    if app_path.exists() {
+        std::fs::remove_dir_all(app_path).map_err(|_| "Couldn't remove app folder in the resources while uninstalling.")?;
+    }
+
     return Ok(());
   }
 
-  std::fs::rename(
-    resources.join("app.asar"),
-    resources.join("original.asar")
-  ).map_err(|_| "Couldn't rename the app.asar in the resources while installing.")?;
-
-  std::fs::create_dir_all(&app_path)
-      .map_err(|_| "Couldn't create app directory while installing.")?;
-
-  for file_url in DOWNLOAD_FILES {
-    let file_name = file_url.split("/").last().unwrap();
-
-    download_file(app_path.join(file_name), file_url.to_string()).await?;
-  }
-  Ok(())
+  inject_raw(resources, app_path).await
 }
 
 async fn download_file(path: PathBuf, url: String) -> Result<(), String> {
