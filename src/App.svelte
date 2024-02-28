@@ -13,18 +13,16 @@
 
 <style>
 
-
-
-.container {
-  height: 100%;
-  width: 100%;
-  padding: 30px;
-  gap: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: start;
-  background-image: linear-gradient(#2a3d4c, #2a7066)
-}
+  .container {
+    height: 100%;
+    width: 100%;
+    padding: 30px;
+    gap: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    background-image: linear-gradient(#2a3d4c, #2a7066)
+  }
 
 </style>
